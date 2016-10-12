@@ -1,49 +1,45 @@
 @objc(ModusEchoSwift) class ModusEchoSwift : CDVPlugin {
-    func echo(command: CDVInvokedUrlCommand) {
+    func echo(_ command: CDVInvokedUrlCommand) {
         var pluginResult = CDVPluginResult(
             status: CDVCommandStatus_ERROR
         )
-
+        
         let msg = command.arguments[0] as? String ?? ""
-
+        
         if msg.characters.count > 0 {
             /* UIAlertController is iOS 8 or newer only. */
-            let toastController: UIAlertController = 
+            let toastController: UIAlertController =
                 UIAlertController(
-                    title: "", 
-                    message: msg, 
-                    preferredStyle: .Alert
-                )
-
-            self.viewController?.presentViewController(
-                toastController, 
-                animated: true, 
+                    title: "",
+                    message: msg,
+                    preferredStyle: .alert
+            )
+            
+            self.viewController?.present(
+                toastController,
+                animated: true,
                 completion: nil
             )
-
+            
             let duration = Double(NSEC_PER_SEC) * 3.0
-            dispatch_after(
-                dispatch_time(
-                    DISPATCH_TIME_NOW, 
-                    Int64(duration)
-                ), 
-                dispatch_get_main_queue(), 
-                { 
-                    toastController.dismissViewControllerAnimated(
-                        true, 
+            DispatchQueue.main.asyncAfter(
+                deadline: DispatchTime.now() + Double(Int64(duration)) / Double(NSEC_PER_SEC),
+                execute: {
+                    toastController.dismiss(
+                        animated: true,
                         completion: nil
                     )
                 }
             )
-
+            
             pluginResult = CDVPluginResult(
                 status: CDVCommandStatus_OK,
-                messageAsString: msg
+                messageAs: msg
             )
         }
-
-        self.commandDelegate!.sendPluginResult(
-            pluginResult, 
+        
+        self.commandDelegate!.send(
+            pluginResult,
             callbackId: command.callbackId
         )
     }
